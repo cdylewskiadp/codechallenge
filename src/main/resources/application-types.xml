@@ -1,0 +1,59 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<types:mule xmlns:types="http://www.mulesoft.org/schema/mule/types">
+  <types:catalog>
+    <types:type name="employee_json" format="json">
+      <types:shape format="weave" example="examples/employee.json"><![CDATA[%dw 2.0
+
+type employee_json = {|
+  employee: {|
+    id: String, 
+    first_name: String, 
+    last_name: String
+  |}
+|} {"example": "{\\\"employee\\\":{\\\"id\\\":\\\"A007\\\",\\\"first_name\\\":\\\"Jan\\\",\\\"last_name\\\":\\\"Doe\\\"}}"}
+
+]]></types:shape>
+    </types:type>
+    <types:type name="score" format="json">
+      <types:shape format="weave" example="examples/output-1.json"><![CDATA[%dw 2.0
+
+type score = {|
+  certificate: Array<{|    id: String,     firstName: String,     LastName: String,     MarksBySubjectWise: {|      Maths: Number {"typeId": "int"},       English: Number {"typeId": "int"},       Arts: Number {"typeId": "int"},       Drawings: Number {"typeId": "int"}    |}  |}>
+|} {"example": "{\\\"certificate\\\":[{\\\"id\\\":\\\"XXX\\\",\\\"firstName\\\":\\\"XXX\\\",\\\"LastName\\\":\\\"YYY\\\",\\\"MarksBySubjectWise\\\":{\\\"Maths\\\":80,\\\"English\\\":90,\\\"Arts\\\":89,\\\"Drawings\\\":100}},{\\\"id\\\":\\\"XXX\\\",\\\"firstName\\\":\\\"XXX\\\",\\\"LastName\\\":\\\"YYY\\\",\\\"MarksBySubjectWise\\\":{\\\"Maths\\\":60,\\\"English\\\":80,\\\"Arts\\\":99,\\\"Drawings\\\":50}}]}"}
+
+]]></types:shape>
+    </types:type>
+    <types:type name="employees" format="json">
+      <types:shape format="weave" example="examples/employees.json"><![CDATA[%dw 2.0
+
+type employees = {|
+  employee: Array<{|    id: String,     first_name: String,     last_name: String  |}>
+|} {"example": "{\\\"employee\\\":[{\\\"id\\\":\\\"A007\\\",\\\"first_name\\\":\\\"Jan\\\",\\\"last_name\\\":\\\"Doe\\\"},{\\\"id\\\":\\\"A008\\\",\\\"first_name\\\":\\\"Ron\\\",\\\"last_name\\\":\\\"David\\\"},{\\\"id\\\":\\\"A009\\\",\\\"first_name\\\":\\\"Jane\\\",\\\"last_name\\\":\\\"Kane\\\"},{\\\"id\\\":\\\"A010\\\",\\\"first_name\\\":\\\"Marsh\\\",\\\"last_name\\\":\\\"Megan\\\"},{\\\"id\\\":\\\"A011\\\",\\\"first_name\\\":\\\"Kelly\\\",\\\"last_name\\\":\\\"Mitch\\\"},{\\\"id\\\":\\\"A012\\\",\\\"first_name\\\":\\\"Chris\\\",\\\"last_name\\\":\\\"Vaste\\\"}]}"}
+
+]]></types:shape>
+    </types:type>
+    <types:type name="scoreboard_json" format="json">
+      <types:shape format="weave" example="examples/scoreboard.json"><![CDATA[%dw 2.0
+
+type scoreboard_json = {|
+  scoreBoard: Array<{|    id: String,     subjects: Array<String>, 
+    score: Array<Number {"typeId": "int"}>
+  |}>
+|} {"example": "{\\\"scoreBoard\\\":[{\\\"id\\\":\\\"A007\\\",\\\"subjects\\\":[\\\"Maths\\\",\\\"English\\\",\\\"Arts\\\",\\\"Drawimgs\\\"],\\\"score\\\":[80,75,89,100]},{\\\"id\\\":\\\"A008\\\",\\\"subjects\\\":[\\\"Maths\\\",\\\"English\\\",\\\"Arts\\\",\\\"Drawimgs\\\"],\\\"score\\\":[70,85,69,90]},{\\\"id\\\":\\\"A021\\\",\\\"subjects\\\":[\\\"Maths\\\",\\\"English\\\",\\\"Arts\\\",\\\"Drawimgs\\\"],\\\"score\\\":[90,87,77,95]}]}"}
+
+]]></types:shape>
+    </types:type>
+  </types:catalog>
+  <types:enrichment select="#089cdaf3-18f8-4481-869c-0b781503c6cb">
+    <types:processor-declaration>
+      <types:input-event>
+        <types:message>
+          <types:payload type="employee_json"/>
+        </types:message>
+      </types:input-event>
+    </types:processor-declaration>
+  </types:enrichment>
+  <types:enrichment select="#cf758646-2459-449f-9140-1272b6c37428"/>
+  <types:enrichment select="#0d29a0a5-b93c-4e42-8109-df2a423dd1fd"/>
+  <types:enrichment select="#28196ef5-e94f-44de-a2cc-2a64b8ec7c3c"/>
+</types:mule>

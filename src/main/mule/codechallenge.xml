@@ -1,0 +1,148 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core" xmlns:http="http://www.mulesoft.org/schema/mule/http"
+	xmlns="http://www.mulesoft.org/schema/mule/core"
+	xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd
+http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd">
+	<http:listener-config name="HTTP_Listener_config" doc:name="HTTP Listener config" doc:id="868895fa-0247-4a72-bd31-cd3f1bc26879" >
+		<http:listener-connection host="0.0.0.0" port="8081" />
+	</http:listener-config>
+	<http:request-config name="HTTP_Request_configuration" doc:name="HTTP Request configuration" doc:id="c3d5c9c6-de02-4ac8-bf79-ec89ab3b54fd">
+		<http:request-connection host="localhost" port="8081" />
+	</http:request-config>
+	<flow name="codechallengeFlow1" doc:id="e6533812-f7a9-47b5-9a58-2ca99af8cb8f" >
+		<http:listener doc:name="Listener" doc:id="c241c8ee-e1aa-416b-bbce-bcecd1c958c8" path="CC1" config-ref="HTTP_Listener_config" allowedMethods="POST">
+			<http:response statusCode="201" />
+		</http:listener>
+		<set-payload value='#[payload.employee.first_name ++ " " ++ payload.employee.last_name ++ " was created successfully. (Employee ID : " ++ payload.employee.id as String ++ ")"]' doc:name="Set Payload" doc:id="82d9af02-33f6-4985-84bb-edcfe59202ec" />
+		<logger level="INFO" doc:name="Logger" doc:id="9f6b08e5-a06c-4f80-8bf9-d38c446e1731"/>
+	</flow>
+	<flow name="codechallengeFlow2" doc:id="249bdd82-62e2-40d9-bb06-d975649c43ac" >
+		<http:listener doc:name="Listener" doc:id="4ac61a4d-7981-4d49-abed-d48c774b12ce" path="CC2" allowedMethods="POST" config-ref="HTTP_Listener_config">
+			<http:response statusCode="201" />
+		</http:listener>
+		<ee:transform doc:name="Transform Message" doc:id="089cdaf3-18f8-4481-869c-0b781503c6cb" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+lookup("codechallengeFlow1",'')]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+		<logger level="INFO" doc:name="Logger" doc:id="cd91fca4-9b0a-4eab-ac74-de02a0056e7c" message="#[payload]"/>
+	</flow>
+	<flow name="codechallengeFlow3" doc:id="ee66c4ec-f948-4ba0-8ac2-a24b9af38891" >
+		<http:listener doc:name="Listener" doc:id="b72ac985-db81-4b03-85da-17c36178ff38" path="CC3" config-ref="HTTP_Listener_config"/>
+		<ee:transform doc:name="Transform Message" doc:id="73c3f3d5-d086-4c87-b5cd-0a7da29dc4d6" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+import * from dw::core::Strings
+
+fun camelfy(aString:String) = 
+	camelize(aString)
+
+---
+{
+	'message': camelfy('SOME_STRING')
+}]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+		<logger level="INFO" doc:name="Logger" doc:id="d89aa5fb-3f22-4745-b82c-5a3afeaae43a" message="#[payload]"/>
+	</flow>
+	<flow name="codechallengeFlow4" doc:id="0d9a8767-69be-404c-b065-56aefae64e5f" >
+		<http:listener doc:name="Listener" doc:id="ed22aa78-f092-43a1-b5c6-28108194241d" path="CC4" config-ref="HTTP_Listener_config"/>
+		<logger level="INFO" doc:name="Logger" doc:id="ec1c9776-1263-4fc7-84c7-763c1c0a4d64" />
+		<scatter-gather doc:name="Scatter-Gather" doc:id="e6beed29-6e0b-4096-98d7-27660329805d" >
+			<route >
+				<set-payload value='#[{"employee":
+	[
+		{"id":"A007","first_name":"Jan","last_name":"Doe"},
+		{"id":"A008","first_name":"Ron","last_name":"David"},
+		{"id":"A009","first_name":"Jane","last_name":"Kane"},
+		{"id":"A010","first_name":"Marsh","last_name":"Megan"},
+		{"id":"A011","first_name":"Kelly","last_name":"Mitch"},
+		{"id":"A012","first_name":"Chris","last_name":"Vaste"}
+		]}]' doc:name="Set employee" doc:id="a529a739-5ba6-47b0-b968-bd98d520cc07" />
+				<ee:transform doc:name="Transform Message" doc:id="28196ef5-e94f-44de-a2cc-2a64b8ec7c3c">
+					<ee:message>
+						<ee:set-payload><![CDATA[%dw 2.0
+output application/json
+---
+payload.employee]]></ee:set-payload>
+					</ee:message>
+				</ee:transform>
+				<logger level="INFO" doc:name="Logger" doc:id="0d002ad1-ec44-4ce2-af11-bdb738c504ab" message="#[payload]"/>
+				<set-variable value="#[payload]" doc:name="Set employee Var" doc:id="6d4be1e5-c59c-467a-a082-69750c9d062f" variableName="employees"/>
+				<logger level="INFO" doc:name="Logger" doc:id="558fd068-0d36-4254-8739-1d6823efcf13" message="#[payload.employee.id]"/>
+			</route>
+			<route >
+				<set-payload value='#[{"scoreBoard":
+	[
+		{"id":"A007","subjects":["Maths","English","Arts","Drawimgs"],"score":[80,75,89,100]},
+		{"id":"A008","subjects":["Maths","English","Arts","Drawimgs"],"score":[70,85,69,90]},
+		{"id":"A021","subjects":["Maths","English","Arts","Drawimgs"],"score":[90,87,77,95]}]}]' doc:name="Set scoreboard" doc:id="f0d2d3bf-9936-41d6-836b-b613ca27f3be" />
+				<ee:transform doc:name="Transform Message" doc:id="0d29a0a5-b93c-4e42-8109-df2a423dd1fd">
+					<ee:message>
+						<ee:set-payload><![CDATA[%dw 2.0
+output application/json
+---
+scoreboard: payload.scoreBoard map(item,index)->{
+	id: item.id,
+	subjectScores:{
+		Maths:item.score[0],
+		English:item.score[1],
+		Arts:item.score[2],
+		Drawings:item.score[3]	
+	}
+}]]></ee:set-payload>
+					</ee:message>
+				</ee:transform>
+				<logger level="INFO" doc:name="Copy_of_Logger" doc:id="9f645bc3-6786-4186-878b-0f7cfd814eb6" message="#[payload]" />
+				<set-variable value="#[payload.scoreboard]" doc:name="Set scoreboard var" doc:id="fe63f099-f790-46c7-b5f0-bf4a3b9ae049" variableName="scoreboard"/>
+				<logger level="INFO" doc:name="Logger" doc:id="58bd6fcc-b33b-4e41-964f-139ffbd0e60b" message="#[payload]" />
+			</route>
+		</scatter-gather>
+		<logger level="INFO" doc:name="Logger" doc:id="d46d1600-bacf-447d-887a-2c5d7e4a1845" message="#[payload]"/>
+		<ee:transform doc:name="Transform Message" doc:id="cf758646-2459-449f-9140-1272b6c37428">
+			<ee:message>
+				<ee:set-payload><![CDATA[ %dw 2.0
+ output application/json
+ import * from dw::core::Arrays
+
+ 
+ ---
+ leftJoin(vars.employees default [], vars.scoreboard default [], (employee) -> employee.id default "", (score) -> score.id default "")]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+		<ee:transform doc:name="Transform Message" doc:id="36ec0d80-2a64-44b2-9c2c-3d5d13f0a73e" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+var employees = vars.employees
+var scoreboard = vars.scoreboard
+output application/json
+---
+certificate: employees map(item)->
+{
+	id: item.id,
+	firstName: item.first_name,
+	lastName: item.last_name,
+	(scoreboard filter ($.id == item.id) map (item) ->
+		{
+			score: item.subjectScores
+		}
+	)
+
+	
+}]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+		<logger level="INFO" doc:name="Logger" doc:id="8a6d1dac-bcfa-4717-a9a0-f34540c3ed82" message="#[payload]"/>
+	</flow>
+	<flow name="codechallengeFlow5" doc:id="6673b5b0-eeb5-4789-a6ae-99d62357d123" >
+		<http:listener doc:name="Listener" doc:id="7b2c2136-a2ac-4105-96e1-4f71be2f71d0" path="/CC5/{RANGE}" allowedMethods="GET" config-ref="HTTP_Listener_config"/>
+		<set-payload value='#[1 to attributes.uriParams.RANGE as Number default 0]' doc:name="Set Payload" doc:id="fa806708-26f3-4e2c-a9a7-8ed167c76b31" />
+		<logger level="INFO" doc:name="Logger" doc:id="40c02028-3d5d-4f26-b454-f75afd791935" />
+	</flow>
+</mule>

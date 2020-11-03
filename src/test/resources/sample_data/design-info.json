@@ -1,0 +1,30 @@
+{
+  "sampleData": {
+    "985e2d29-52f9-47dd-9611-dfdd3e9a79b2": {
+      "payload": "sample_data/list_json_2.json"
+    },
+    "8a44268d-e115-49f9-a140-b9f88d9ac62f": {
+      "vars-scoreboard": "sample_data/list_json_5.json",
+      "payload": "sample_data/unknown.dwl",
+      "vars-employees": "sample_data/list_json_6.json"
+    },
+    "28196ef5-e94f-44de-a2cc-2a64b8ec7c3c": {
+      "payload": "sample_data/object.dwl"
+    },
+    "0d29a0a5-b93c-4e42-8109-df2a423dd1fd": {
+      "payload": "sample_data/object_1.dwl"
+    },
+    "cf758646-2459-449f-9140-1272b6c37428": {
+      "vars-scoreboard": "sample_data/list_json.json",
+      "vars-employees": "sample_data/list_json_1.json"
+    },
+    "0a52f76c-50d8-43c4-845b-f872fd5e545a": {
+      "vars-scoreboard": "sample_data/list_json_3.json",
+      "vars-employees": "sample_data/list_json_4.json"
+    },
+    "36ec0d80-2a64-44b2-9c2c-3d5d13f0a73e": {
+      "vars-scoreboard": "sample_data/list_json_8.json",
+      "vars-employees": "sample_data/list_json_7.json"
+    }
+  }
+}
