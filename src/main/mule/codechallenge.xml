@@ -27,7 +27,7 @@ http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/
 				<ee:set-payload ><![CDATA[%dw 2.0
 output application/json
 ---
-lookup("codechallengeFlow1",'')]]></ee:set-payload>
+lookup("codechallengeFlow1",payload)]]></ee:set-payload>
 			</ee:message>
 		</ee:transform>
 		<logger level="INFO" doc:name="Logger" doc:id="cd91fca4-9b0a-4eab-ac74-de02a0056e7c" message="#[payload]"/>
@@ -142,7 +142,14 @@ certificate: employees map(item)->
 	</flow>
 	<flow name="codechallengeFlow5" doc:id="6673b5b0-eeb5-4789-a6ae-99d62357d123" >
 		<http:listener doc:name="Listener" doc:id="7b2c2136-a2ac-4105-96e1-4f71be2f71d0" path="/CC5/{RANGE}" allowedMethods="GET" config-ref="HTTP_Listener_config"/>
-		<set-payload value='#[1 to attributes.uriParams.RANGE as Number default 0]' doc:name="Set Payload" doc:id="fa806708-26f3-4e2c-a9a7-8ed167c76b31" />
+		<ee:transform doc:name="Transform Message" doc:id="5245fa44-92f7-49bc-8fab-ebfaf0417110" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+1 to attributes.uriParams.RANGE as Number default 0]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
 		<logger level="INFO" doc:name="Logger" doc:id="40c02028-3d5d-4f26-b454-f75afd791935" />
 	</flow>
 </mule>
